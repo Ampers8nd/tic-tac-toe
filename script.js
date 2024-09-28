@@ -1,12 +1,10 @@
-// gameboard object which has the board (an array) as well as the X's and O's (probably)
-// a controller that controls the flow of the game (switching between different players for now)
-let turnEnded = false;
 let gameEnded = false;
 let filledCells = 0;
+let firstPlayer = 'X', secondPlayer = 'O';
 
 const gameBoard = (function() {
     const arr = [];
-    // array indexes from 0 to 8, meaning 9 slots or a 3x3 grid.
+    // array indexes from 0 to 8, meaning 9 slots or a 3x3.
     for (i = 0; i < 9; i++) {
         arr[i] = '';
     }
@@ -29,19 +27,21 @@ const gameController =  (function() {
             [0, 4, 8], // Diagonal 1
             [2, 4, 6]  // Diagonal 2
         ];
+
+        if (filledCells == 9) {
+            gameEnded = true;
+        }
     
         // Loop through each win condition
         for (let condition of winConditions) {
             const [a, b, c] = condition;
             
-            // Check if grid[a], grid[b], and grid[c] are equal and not empty
-            if (grid[a] && grid[a] === grid[b] && grid[a] === grid[c]) {
-                return grid[a]; // Return the winner ("X" or "O")
+            // Check if gameBoard[a], gameBoard[b], and gameBoard[c] are equal and not empty
+            if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                gameEnded = true;
+                alert(gameBoard[a] + " has won!");
             }
         }
-    
-        // If no winner, return null
-        return null;
     }
     const endGame = (gameEnded) => {
         if (gameEnded == true) {
@@ -50,19 +50,28 @@ const gameController =  (function() {
     }
     const takeInput = () => {
         let input = prompt("Where would you like to place your symbol?")
+        let player;
+        if (filledCells % 2 == 0 || filledCells == 0) {
+            player = firstPlayer;
+        } else if (filledCells % 2 == 1 && filledCells != 0) {
+            player = secondPlayer;
+        } 
+
         if (gameBoard[input] != '') {
             console.log("Cannot place there.");
         } else {
-            gameBoard[input] = "X"
+            gameBoard[input] = player;
             console.log(gameBoard);
         }
-        turnEnded = true;
-    }
-    // TO-DO: function to determine the player turns.
-    // how about: X always starts? Then for every even number that filledCells takes on, X will go. Vice versa for O
-    
 
-    return { checkState, endGame, takeInput, gameEnded, turnEnded, checkWin}
+        // if (input == exit) {
+        //     gameEnded = true;
+        // }
+        filledCells++;
+
+    }
+
+    return { checkState, endGame, takeInput, gameEnded}
 })();
 
 // start the game
